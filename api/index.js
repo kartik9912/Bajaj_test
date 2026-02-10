@@ -1,3 +1,9 @@
+export const config = {
+  api: {
+    bodyParser: true
+  }
+};
+
 import express from "express";
 import axios from "axios";
 
