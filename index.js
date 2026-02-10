@@ -1,11 +1,8 @@
-export const config = {
-  api: {
-    bodyParser: true
-  }
-};
-
 import express from "express";
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -52,9 +49,8 @@ function hcf(arr) {
 }
 
 
-
 app.get("/health", (req, res) => {
-  return res.status(200).json({
+  res.status(200).json({
     is_success: true,
     official_email: EMAIL
   });
@@ -65,9 +61,8 @@ app.post("/bfhl", async (req, res) => {
     const body = req.body || {};
     const keys = Object.keys(body);
 
-    if (keys.length !== 1) {
+    if (keys.length !== 1)
       return error(res, 400, "Exactly one key is required");
-    }
 
     const key = keys[0];
     const value = body[key];
@@ -75,37 +70,32 @@ app.post("/bfhl", async (req, res) => {
 
     switch (key) {
       case "fibonacci":
-        if (!Number.isInteger(value) || value < 0) {
+        if (!Number.isInteger(value) || value < 0)
           return error(res, 400, "Invalid fibonacci input");
-        }
         data = fibonacci(value);
         break;
 
       case "prime":
-        if (!Array.isArray(value)) {
+        if (!Array.isArray(value))
           return error(res, 400, "Prime expects array");
-        }
         data = value.filter(v => Number.isInteger(v) && isPrime(v));
         break;
 
       case "lcm":
-        if (!Array.isArray(value) || value.some(v => !Number.isInteger(v))) {
+        if (!Array.isArray(value) || value.some(v => !Number.isInteger(v)))
           return error(res, 400, "LCM expects integer array");
-        }
         data = lcm(value);
         break;
 
       case "hcf":
-        if (!Array.isArray(value) || value.some(v => !Number.isInteger(v))) {
+        if (!Array.isArray(value) || value.some(v => !Number.isInteger(v)))
           return error(res, 400, "HCF expects integer array");
-        }
         data = hcf(value);
         break;
 
       case "AI":
-        if (typeof value !== "string") {
+        if (typeof value !== "string")
           return error(res, 400, "AI expects string");
-        }
 
         const aiRes = await axios.post(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
@@ -123,13 +113,13 @@ app.post("/bfhl", async (req, res) => {
         return error(res, 400, "Invalid key");
     }
 
-    return res.status(200).json({
+    res.status(200).json({
       is_success: true,
       official_email: EMAIL,
       data
     });
 
-  } catch (err) {
+  } catch {
     return error(res, 500, "Internal Server Error");
   }
 });
